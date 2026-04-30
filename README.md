@@ -1,47 +1,46 @@
 # Shadowfox 🚀
 
-A collection of AI/ML-based projects developed as part of my virtual internship experience. This repository showcases practical implementations of machine learning and NLP concepts in real-world scenarios.
+A collection of AI/ML-based projects developed as part of my virtual internship experience. This repository highlights practical implementations of machine learning and NLP concepts across different complexity levels.
 
 ---
 
 ## 📂 Projects Included
 
-### 1. Loan Approval Prediction (LendAI)
+### 1. LendAI (Intermediate Level)
 
-A machine learning application that predicts whether a loan application should be approved based on applicant details.
+A machine learning system that predicts loan approval based on applicant data.
 
 **Key Features**
 
 * Data preprocessing and feature engineering
-* Classification model for prediction
-* Real-time prediction interface (if applicable)
+* Classification model for approval prediction
 * Handles missing and categorical data
+* Structured pipeline for real-world ML workflow
 
 **Tech Stack**
 
 * Python
 * Pandas, NumPy
 * Scikit-learn
-* (Optional: Flask / Streamlit if used)
+* Flask
 
 ---
 
-### 2. Autocorrect Keyboard
+### 2. AutoKey (Beginner Level)
 
-An intelligent autocorrect system that predicts and corrects user input in real-time using NLP techniques.
+A basic autocorrect keyboard system that predicts and corrects user input using NLP techniques.
 
 **Key Features**
 
-* Word prediction and correction
+* Word correction and prediction
 * Text preprocessing and tokenization
-* Probability-based or model-based correction
-* Improves typing efficiency and accuracy
+* Simple probability-based correction logic
+* Focus on core NLP fundamentals
 
 **Tech Stack**
 
 * Python
-* NLP techniques
-* (Optional: NLTK / custom algorithms)
+* Basic NLP techniques
 
 ---
 
@@ -49,8 +48,8 @@ An intelligent autocorrect system that predicts and corrects user input in real-
 
 ```
 Shadowfox/
- ├── loan-approval/
- └── autocorrect-keyboard/
+ ├── LendAI/
+ └── AutoKey/
 ```
 
 ---
@@ -60,16 +59,16 @@ Shadowfox/
 1. Clone the repository:
 
 ```
-git clone https://github.com/your-username/Shadowfox.git
+git clone https://github.com/liyasajad/Shadowfox.git
 cd Shadowfox
 ```
 
 2. Navigate to a project:
 
 ```
-cd loan-approval
+cd LendAI
 # or
-cd autocorrect-keyboard
+cd AutoKey
 ```
 
 3. Install dependencies:
@@ -84,7 +83,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-*(Modify commands based on your actual file names.)*
+*(Adjust commands based on actual file names if needed.)*
 
 ---
 
@@ -92,26 +91,26 @@ python app.py
 
 This repository demonstrates:
 
-* Application of machine learning in decision systems
+* Application of machine learning in decision-making systems
 * Use of NLP for text correction
-* End-to-end project development workflow
-* Practical problem-solving using AI
+* Progressive learning from beginner to intermediate level projects
+* End-to-end project development and structuring
 
 ---
 
 ## 📌 Future Improvements
 
-* Improve model accuracy with advanced algorithms
-* Add UI enhancements for better user experience
+* Improve model performance and accuracy
+* Enhance UI/UX for better interaction
 * Deploy projects for public access
-* Integrate deep learning approaches
+* Explore advanced ML/DL techniques
 
 ---
 
 ## 👤 Author
 
-**Liya**
-AI/ML Enthusiast | Developer
+**Liya Sajad**
+GitHub: https://github.com/liyasajad
 
 ---
 
