@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AutoKey — N-gram Keyboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:     #2a2a2a;
+  --surf:   #353535;
+  --surf2:  #3f3f3f;
+  --border: rgba(255,255,255,0.12);
+  --brite:  rgba(255,255,255,0.22);
+  --orange: #FF6B01;
+  --orng15: rgba(255,107,1,0.15);
+  --orng30: rgba(255,107,1,0.30);
+  --white:  #FFFFFF;
+  --dim:    rgba(255,255,255,0.45);
+  --dimmer: rgba(255,255,255,0.22);
+  --r:      12px;
+  --mono:   'JetBrains Mono','Fira Mono',monospace;
+  --sans:   'Inter','Segoe UI',system-ui,sans-serif;
+}
+
+html,body{height:100%;}
+
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--white);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:24px 20px 48px;
+  gap:20px;
+}
+
+/* ── HEADER ── */
+header{
+  width:100%;max-width:1200px;
+  display:flex;align-items:center;gap:14px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+
+.logo{font-size:24px;font-weight:700;letter-spacing:-0.6px;color:var(--white);}
+.logo em{font-style:normal;color:var(--orange);}
+
+.badge{
+  font-size:11px;font-weight:600;letter-spacing:0.5px;
+  padding:3px 10px;border-radius:999px;
+  background:var(--orng15);color:var(--orange);
+  border:1px solid rgba(255,107,1,0.35);
+}
+
+.corpus-pill{
+  margin-left:auto;display:flex;align-items:center;gap:7px;
+  font-size:12px;color:var(--dim);
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--orange);flex-shrink:0;
+  box-shadow:0 0 6px var(--orange);
+}
+
+/* ── MAIN GRID ── */
+.main-grid{
+  width:100%;max-width:1200px;
+  display:grid;
+  grid-template-columns:1fr 310px;
+  gap:20px;
+  align-items:start;
+}
+
+/* ── LEFT COL ── */
+.col-left{display:flex;flex-direction:column;gap:16px;}
+
+/* stat pills */
+.stats-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+.stat{
+  font-size:12px;font-weight:500;
+  padding:5px 13px;border-radius:999px;
+  background:var(--surf);border:1px solid var(--border);
+  color:var(--dim);display:flex;align-items:center;gap:5px;
+}
+.stat b{color:var(--white);font-weight:600;}
+
+/* autocorrect pill toggle */
+.ac-wrap{display:flex;align-items:center;gap:9px;margin-left:auto;}
+.ac-label{font-size:12px;font-weight:500;color:var(--dim);}
+
+.pill-switch{
+  position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;
+}
+.pill-switch input{opacity:0;width:0;height:0;position:absolute;}
+.pill-track{
+  position:absolute;inset:0;border-radius:999px;
+  background:var(--surf2);border:1px solid var(--border);
+  transition:background .2s,border-color .2s;
+}
+.pill-thumb{
+  position:absolute;top:3px;left:3px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--dim);
+  transition:transform .2s,background .2s;
+}
+.pill-switch input:checked ~ .pill-track{background:var(--orange);border-color:var(--orange);}
+.pill-switch input:checked ~ .pill-thumb{transform:translateX(20px);background:var(--white);}
+
+/* textarea */
+#input{
+  font-family:var(--mono);font-size:15px;
+  width:100%;min-height:130px;resize:vertical;
+  padding:14px 16px;
+  background:var(--surf);
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  color:var(--white);line-height:1.7;
+  outline:none;caret-color:var(--orange);
+  transition:border-color .18s,box-shadow .18s;
+}
+#input:focus{
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px var(--orng15);
+}
+#input::placeholder{color:var(--dimmer);}
+
+/* suggestions */
+.sug-label{
+  font-size:10px;font-weight:600;letter-spacing:0.7px;
+  color:var(--dim);text-transform:uppercase;margin-bottom:8px;
+}
+
+#sug-row{display:flex;gap:7px;flex-wrap:wrap;min-height:36px;align-items:center;}
+
+.chip{
+  font-family:var(--mono);font-size:13px;font-weight:500;
+  padding:6px 16px;border-radius:999px;
+  border:1.5px solid var(--border);
+  background:transparent;color:var(--white);
+  cursor:pointer;user-select:none;
+  transition:border-color .13s,background .13s,color .13s,box-shadow .13s;
+  animation:pop .15s ease;
+}
+.chip:hover{
+  border-color:var(--orange);
+  background:var(--orng15);
+  color:var(--white);
+  box-shadow:0 0 0 2px var(--orng30);
+}
+.chip:active{background:var(--orng30);}
+
+.chip.top{
+  background:var(--orange);
+  border-color:var(--orange);
+  color:var(--white);font-weight:600;
+}
+.chip.top:hover{background:#e05f00;border-color:#e05f00;}
+
+.chip.corrected{
+  border-color:var(--orange);
+  color:var(--orange);
+  background:var(--orng15);
+  font-size:12px;
+}
+
+@keyframes pop{
+  from{opacity:0;transform:translateY(5px) scale(.94);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+.empty{font-size:12px;color:var(--dimmer);font-style:italic;}
+
+/* ── KEYBOARD ── */
+.kb{display:flex;flex-direction:column;gap:6px;}
+.kb-row{display:flex;justify-content:center;gap:6px;}
+
+.key{
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  height:44px;min-width:42px;padding:0 6px;
+  border:1.5px solid var(--border);border-radius:9px;
+  background:var(--surf);color:var(--white);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  user-select:none;flex:0 0 auto;
+  transition:background .1s,border-color .1s,color .1s,box-shadow .1s,transform .07s;
+}
+.key:hover{
+  border-color:var(--orange);
+  background:var(--orng15);
+  box-shadow:0 0 0 2px var(--orng30);
+}
+.key:active{
+  background:var(--orange);
+  border-color:var(--orange);
+  color:var(--white);
+  transform:scale(.92);
+}
+.key.wide  {min-width:64px;}
+.key.space {min-width:196px;}
+.key.enter {
+  min-width:76px;
+  background:var(--orng15);
+  border-color:var(--orange);
+  color:var(--orange);font-weight:600;
+}
+.key.enter:hover{background:var(--orange);color:var(--white);}
+.key.back  {min-width:56px;font-size:17px;color:var(--dim);}
+.key.shift {min-width:58px;}
+.key.shift.on{border-color:var(--orange);color:var(--orange);background:var(--orng15);}
+.key.flash {
+  background:var(--orange)!important;
+  border-color:var(--orange)!important;
+  color:var(--white)!important;
+  transform:scale(1.1);
+  box-shadow:0 0 12px var(--orng30);
+}
+
+/* toolbar */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+.tb-btn{
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  padding:7px 16px;border-radius:8px;
+  border:1.5px solid var(--border);
+  background:transparent;color:var(--dim);
+  cursor:pointer;
+  transition:background .13s,border-color .13s,color .13s;
+}
+.tb-btn:hover{
+  border-color:var(--orange);
+  background:var(--orng15);
+  color:var(--white);
+}
+.tb-btn:active{background:var(--orange);border-color:var(--orange);color:var(--white);}
+
+.tab-hint{margin-left:auto;font-size:11px;color:var(--dimmer);}
+
+/* ── RIGHT COL ── */
+.col-right{display:flex;flex-direction:column;gap:14px;position:sticky;top:24px;}
+
+.panel{
+  background:var(--surf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+
+.panel-hdr{
+  padding:11px 16px;
+  font-size:11px;font-weight:600;letter-spacing:0.5px;
+  color:var(--white);text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-sub{font-size:10px;color:var(--dimmer);font-weight:400;letter-spacing:0;text-transform:none;}
+
+.panel-body{padding:16px;}
+
+/* model info table */
+.info-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.info-tbl td{padding:7px 0;color:var(--dim);}
+.info-tbl td:last-child{
+  text-align:right;color:var(--white);
+  font-family:var(--mono);font-size:12px;font-weight:500;
+}
+.info-tbl tr+tr td{border-top:1px solid var(--border);}
+
+/* perplexity */
+.ppx-box{text-align:center;padding:10px 0 6px;}
+.ppx-val{
+  font-size:38px;font-weight:700;
+  font-family:var(--mono);
+  color:var(--orange);line-height:1;
+}
+.ppx-sub{font-size:11px;color:var(--dim);margin-top:6px;}
+
+/* probability bars */
+.bar-row{
+  display:grid;
+  grid-template-columns:78px 1fr 40px;
+  align-items:center;gap:10px;
+  margin:8px 0;
+  font-family:var(--mono);font-size:12px;
+}
+.bar-word{color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-bg{
+  height:7px;background:var(--surf2);
+  border-radius:999px;overflow:hidden;min-width:0;
+}
+.bar-fill{
+  height:100%;border-radius:999px;
+  background:var(--dim);
+  transition:width .35s ease;
+}
+.bar-fill.top{background:var(--orange);}
+.bar-pct{font-size:10px;color:var(--dim);text-align:right;white-space:nowrap;}
+
+/* divider inside panels */
+.pdiv{height:1px;background:var(--border);margin:10px 0;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Auto<em>Key</em></div>
+  <span class="badge">N-gram · Trigram</span>
+  <div class="corpus-pill">
+    <div class="live-dot"></div>
+    <span id="corpus-info">Loading…</span>
+  </div>
+</header>
+
+<!-- MAIN GRID -->
+<div class="main-grid">
+
+  <!-- ══ LEFT ══ -->
+  <div class="col-left">
+
+    <!-- stats + autocorrect toggle -->
+    <div class="stats-row">
+      <div class="stat">Words <b id="s-words">0</b></div>
+      <div class="stat">Chars <b id="s-chars">0</b></div>
+      <div class="stat">Accepted <b id="s-accepted">0</b></div>
+      <div class="ac-wrap">
+        <span class="ac-label">Autocorrect</span>
+        <label class="pill-switch" title="Toggle Autocorrect">
+          <input type="checkbox" id="ac-toggle" checked onchange="toggleAC()"/>
+          <div class="pill-track"></div>
+          <div class="pill-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- textarea -->
+    <textarea id="input" placeholder="Start typing… predictions and scores update on the right →"></textarea>
+
+    <!-- suggestions -->
+    <div>
+      <div class="sug-label">Next word — click to insert &nbsp;·&nbsp; Tab = top prediction</div>
+      <div id="sug-row"><span class="empty">Start typing to see suggestions…</span></div>
+    </div>
+
+    <!-- keyboard -->
+    <div class="kb" id="keyboard"></div>
+
+    <!-- toolbar -->
+    <div class="toolbar">
+      <button class="tb-btn" id="copy-btn" onclick="copyText()">Copy text</button>
+      <button class="tb-btn" onclick="clearAll()">Clear</button>
+      <span class="tab-hint">Shift = caps &nbsp;·&nbsp; Tab = accept top suggestion</span>
+    </div>
+
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div class="col-right">
+
+    <!-- Model info -->
+    <div class="panel">
+      <div class="panel-hdr">Model info</div>
+      <div class="panel-body">
+        <table class="info-tbl">
+          <tr><td>Vocab size</td><td id="m-vocab">—</td></tr>
+          <tr><td>Total tokens</td><td id="m-tokens">—</td></tr>
+          <tr><td>Bigram contexts</td><td id="m-bigram">—</td></tr>
+          <tr><td>Trigram contexts</td><td id="m-trigram">—</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Perplexity -->
+    <div class="panel">
+      <div class="panel-hdr">
+        Perplexity
+        <span class="panel-sub">lower = better fit</span>
+      </div>
+      <div class="panel-body">
+        <div class="ppx-box">
+          <div class="ppx-val" id="ppx-val">—</div>
+          <div class="ppx-sub">interpolated trigram score</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- N-gram scores -->
+    <div class="panel">
+      <div class="panel-hdr">
+        Probability scores
+        <span class="panel-sub" id="pred-count"></span>
+      </div>
+      <div class="panel-body" id="bars-body">
+        <div class="empty">Start typing to see scores…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let shift=false, accepted=0, acOn=true, debPred=null, debPpx=null, lastPreds=[];
+
+/* ── keyboard ── */
+const ROWS=[
+  ["q","w","e","r","t","y","u","i","o","p"],
+  ["a","s","d","f","g","h","j","k","l"],
+  ["Shift","z","x","c","v","b","n","m","Back"],
+  ["Space",".",",","Return"]
+];
+const LBL={Space:"space",Return:"return",Back:"⌫",Shift:"⇧"};
+
+function buildKeyboard(){
+  const kb=$("keyboard");
+  ROWS.forEach(row=>{
+    const div=document.createElement("div"); div.className="kb-row";
+    row.forEach(k=>{
+      const el=document.createElement("div"); el.className="key";
+      el.id="key-"+k.toLowerCase(); el.textContent=LBL[k]||k;
+      if(k==="Space")       el.className+=" space";
+      else if(k==="Return") el.className+=" enter wide";
+      else if(k==="Back")   el.className+=" back wide";
+      else if(k==="Shift")  {el.className+=" shift"; el.id="key-shift";}
+      el.addEventListener("mousedown",e=>{e.preventDefault(); pressKey(k);});
+      div.appendChild(el);
+    });
+    kb.appendChild(div);
+  });
+}
+
+function pressKey(k){
+  const ta=$("input"), pos=ta.selectionStart??ta.value.length;
+  if(k==="Back"){
+    if(pos>0){ta.value=ta.value.slice(0,pos-1)+ta.value.slice(pos); setCaret(ta,pos-1);}
+  } else if(k==="Shift"){
+    shift=!shift; $("key-shift").classList.toggle("on",shift);
+  } else if(k==="Space"){
+    insert(ta,pos," ");
+    if(acOn) doAutocorrect(ta);
+  } else if(k==="Return"){
+    insert(ta,pos,"\n");
+  } else {
+    const ch=(shift&&k.length===1)?k.toUpperCase():k;
+    insert(ta,pos,ch);
+    if(shift){shift=false; $("key-shift").classList.remove("on");}
+  }
+  ta.dispatchEvent(new Event("input")); ta.focus();
+}
+
+function insert(ta,pos,ch){ta.value=ta.value.slice(0,pos)+ch+ta.value.slice(pos); setCaret(ta,pos+ch.length);}
+function setCaret(ta,pos){pos=Math.max(0,pos); ta.selectionStart=ta.selectionEnd=pos;}
+
+/* ── autocorrect ── */
+async function doAutocorrect(ta){
+  const words=ta.value.trimEnd().split(/\s+/);
+  const lastWord=words[words.length-1];
+  if(!lastWord||lastWord.length<2) return;
+  try{
+    const r=await fetch("/api/autocorrect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({word:lastWord})});
+    const d=await r.json();
+    if(d.changed){
+      const idx=ta.value.lastIndexOf(lastWord);
+      if(idx!==-1){
+        ta.value=ta.value.slice(0,idx)+d.corrected+ta.value.slice(idx+lastWord.length);
+        setCaret(ta,ta.value.length);
+        showCorrectChip(lastWord,d.corrected);
+      }
+    }
+  } catch(_){}
+}
+
+function showCorrectChip(orig,fixed){
+  const c=document.createElement("div");
+  c.className="chip corrected";
+  c.textContent=orig+" → "+fixed;
+  $("sug-row").prepend(c);
+  setTimeout(()=>c.remove(),3500);
+}
+
+/* ── predictions ── */
+async function fetchPredictions(text){
+  try{
+    const r=await fetch("/api/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,top_n:8})});
+    const d=await r.json();
+    lastPreds=d.predictions||[];
+    renderChips(lastPreds); renderBars(lastPreds);
+  } catch(_){}
+}
+
+function renderChips(preds){
+  const row=$("sug-row"); row.innerHTML="";
+  if(!preds.length){row.innerHTML='<span class="empty">No suggestions</span>'; return;}
+  preds.forEach((p,i)=>{
+    const c=document.createElement("div");
+    c.className=i===0?"chip top":"chip";
+    c.textContent=p.word;
+    c.title="P="+(p.prob*100).toFixed(4)+"%";
+    c.onclick=()=>acceptWord(p.word);
+    row.appendChild(c);
+  });
+}
+
+function renderBars(preds){
+  const body=$("bars-body");
+  if(!preds.length){body.innerHTML='<div class="empty">No predictions yet.</div>'; return;}
+  $("pred-count").textContent=preds.length+" candidates";
+  body.innerHTML=preds.map((p,i)=>`
+    <div class="bar-row">
+      <span class="bar-word" title="${p.word}">${p.word}</span>
+      <div class="bar-bg"><div class="bar-fill ${i===0?'top':''}" style="width:${p.pct}%"></div></div>
+      <span class="bar-pct">${p.pct}%</span>
+    </div>`).join("");
+}
+
+function acceptWord(word){
+  const ta=$("input"),val=ta.value;
+  const sep=(val===""||val.endsWith(" ")||val.endsWith("\n"))?"" : " ";
+  ta.value=val+sep+word+" ";
+  ta.dispatchEvent(new Event("input"));
+  accepted++; $("s-accepted").textContent=accepted;
+  flashKey(word[0]); ta.focus();
+}
+
+function flashKey(letter){
+  const el=document.getElementById("key-"+letter.toLowerCase()); if(!el) return;
+  el.classList.add("flash");
+  setTimeout(()=>el.classList.remove("flash"),320);
+}
+
+/* ── perplexity ── */
+async function fetchPerplexity(){
+  const text=$("input").value.trim();
+  if(!text){$("ppx-val").textContent="—"; return;}
+  try{
+    const r=await fetch("/api/perplexity",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});
+    const d=await r.json();
+    $("ppx-val").textContent=d.perplexity.toFixed(1);
+  } catch(_){}
+}
+
+/* ── stats ── */
+function updateStats(){
+  const val=$("input").value;
+  $("s-words").textContent=val.trim()?val.trim().split(/\s+/).length:0;
+  $("s-chars").textContent=val.length;
+}
+
+async function loadModelInfo(){
+  try{
+    const r=await fetch("/api/stats"); const d=await r.json();
+    $("corpus-info").textContent=d.vocab_size.toLocaleString()+" words · "+d.total_tokens.toLocaleString()+" tokens";
+    $("m-vocab").textContent=d.vocab_size.toLocaleString();
+    $("m-tokens").textContent=d.total_tokens.toLocaleString();
+    $("m-bigram").textContent=d.bigram_contexts.toLocaleString();
+    $("m-trigram").textContent=d.trigram_contexts.toLocaleString();
+  } catch(_){$("corpus-info").textContent="Model ready";}
+}
+
+/* ── toolbar ── */
+function clearAll(){
+  $("input").value="";
+  $("sug-row").innerHTML='<span class="empty">Start typing to see suggestions…</span>';
+  $("bars-body").innerHTML='<div class="empty">Start typing to see scores…</div>';
+  $("ppx-val").textContent="—"; $("pred-count").textContent="";
+  accepted=0; lastPreds=[]; $("s-accepted").textContent=0;
+  updateStats(); $("input").focus();
+}
+
+function copyText(){
+  navigator.clipboard.writeText($("input").value).then(()=>{
+    const b=$("copy-btn"); b.textContent="Copied!";
+    b.style.background="var(--orange)";
+    b.style.borderColor="var(--orange)";
+    b.style.color="var(--white)";
+    setTimeout(()=>{
+      b.textContent="Copy text";
+      b.style.background=""; b.style.borderColor=""; b.style.color="";
+    },1500);
+  });
+}
+
+function toggleAC(){
+  acOn=$("ac-toggle").checked;
+}
+
+/* ── listeners ── */
+$("input").addEventListener("input",()=>{
+  updateStats();
+  clearTimeout(debPred); debPred=setTimeout(()=>fetchPredictions($("input").value),120);
+  clearTimeout(debPpx);  debPpx=setTimeout(fetchPerplexity,500);
+});
+
+$("input").addEventListener("keydown",e=>{
+  if(e.key==="Tab"){e.preventDefault(); if(lastPreds.length) acceptWord(lastPreds[0].word);}
+  if(e.key===" "&&acOn) setTimeout(()=>doAutocorrect($("input")),50);
+});
+
+/* ── init ── */
+buildKeyboard(); loadModelInfo(); $("input").focus();
+</script>
+</body>
+</html>
