@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Environment variables
+.env
+*.env
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Model artifacts (large binaries)
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# Data files (raw/large datasets)
+data/raw/
+data/processed/
+*.csv
+*.xlsx
+*.parquet
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+frontend/.next/
+frontend/build/

@@ -1,0 +1,15 @@
+data:
+  raw_data_path: "data/raw/loan_prediction.csv"
+  processed_data_path: "data/processed/"
+
+model:
+  model_path: "models/lendai_model.pkl"
+  preprocessor_path: "models/preprocessor.pkl"
+  random_state: 42
+  test_size: 0.2
+
+hyperparameters:
+  random_forest:
+    n_estimators: [50, 100, 200]
+    max_depth: [None, 10, 20]
+    min_samples_split: [2, 5, 10]

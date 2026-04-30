@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LendAI - Premium Loan Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --surface-color: #0A0A0A;
+            --border-color: #222222;
+            --border-focus: #555555;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --accent: #E5E5E5;
+            --accent-hover: #FFFFFF;
+            --success: #10B981;
+            --error: #EF4444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, #151515 0%, transparent 70%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+            padding: 2rem;
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .premium-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+            color: var(--text-main);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            box-sizing: border-box; /* This fixes the boxes exceeding their container */
+            background: #000000;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            appearance: none; /* Removes default styling for a cleaner look */
+        }
+
+        select {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem top 50%;
+            background-size: 0.65rem auto;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        select option {
+            background: #111111;
+            color: white;
+            padding: 10px;
+        }
+
+        button {
+            width: 100%;
+            background: var(--accent);
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-radius: 50%;
+            border-top-color: #000000;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        /* Result Display */
+        #result-container {
+            display: none;
+            margin-top: 2.5rem;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid var(--border-color);
+        }
+
+        .approved {
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+            border-top-color: var(--success) !important;
+        }
+
+        .rejected {
+            background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, transparent 100%);
+            border-top-color: var(--error) !important;
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .approved .result-title { color: var(--success); }
+        .rejected .result-title { color: var(--error); }
+
+        .result-prob {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+            font-weight: 300;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; filter: blur(10px); }
+            to { opacity: 1; filter: blur(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .premium-panel {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="premium-panel">
+            <div class="header">
+                <h1>LendAI</h1>
+                <p>QUANTITATIVE LOAN ANALYSIS</p>
+            </div>
+
+            <form id="prediction-form">
+                <div class="form-grid">
+                    
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="Gender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Married</label>
+                        <select name="Married" required>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dependents</label>
+                        <select name="Dependents" required>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3+">3+</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Education</label>
+                        <select name="Education" required>
+                            <option value="Graduate">Graduate</option>
+                            <option value="Not Graduate">Not Graduate</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Self Employed</label>
+                        <select name="Self_Employed" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Property Area</label>
+                        <select name="Property_Area" required>
+                            <option value="Urban">Urban</option>
+                            <option value="Semiurban">Semiurban</option>
+                            <option value="Rural">Rural</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Applicant Income ($)</label>
+                        <input type="number" name="ApplicantIncome" value="5000" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Coapplicant Income ($)</label>
+                        <input type="number" name="CoapplicantIncome" value="0" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Loan Amount ('000s)</label>
+                        <input type="number" name="LoanAmount" value="150" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Loan Term (Days)</label>
+                        <input type="number" name="Loan_Amount_Term" value="360" min="1" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Credit History Rating</label>
+                        <select name="Credit_History" required>
+                            <option value="1.0">1.0 &mdash; Exceptional / Good</option>
+                            <option value="0.0">0.0 &mdash; Subprime / Bad</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <button type="submit" id="submit-btn">
+                            <span id="btn-text">Execute Analysis</span>
+                            <div class="spinner" id="btn-spinner"></div>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="result-container">
+                <h2 class="result-title" id="result-title">Approved</h2>
+                <p class="result-prob" id="result-prob">Confidence: 85%</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Format numbers correctly
+            data.ApplicantIncome = Number(data.ApplicantIncome);
+            data.CoapplicantIncome = Number(data.CoapplicantIncome);
+            data.LoanAmount = Number(data.LoanAmount);
+            data.Loan_Amount_Term = Number(data.Loan_Amount_Term);
+            data.Credit_History = Number(data.Credit_History);
+
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const resultContainer = document.getElementById('result-container');
+            const resultTitle = document.getElementById('result-title');
+            const resultProb = document.getElementById('result-prob');
+            
+            // Loading State
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'block';
+            resultContainer.style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if(response.ok) {
+                    resultContainer.className = result.approved ? 'approved' : 'rejected';
+                    resultTitle.textContent = result.approved ? 'Analysis: Approved' : 'Analysis: Denied';
+                    resultProb.textContent = `Algorithm Confidence: ${(result.probability * 100).toFixed(1)}%`;
+                } else {
+                    resultContainer.className = 'rejected';
+                    resultTitle.textContent = 'System Error';
+                    resultProb.textContent = result.error || 'Diagnostic failed.';
+                }
+                
+                resultContainer.style.display = 'block';
+                
+            } catch (error) {
+                console.error(error);
+                resultContainer.className = 'rejected';
+                resultTitle.textContent = 'Connection Error';
+                resultProb.textContent = 'Could not establish secure link.';
+                resultContainer.style.display = 'block';
+            } finally {
+                // Reset Loading State
+                btnText.style.display = 'block';
+                btnSpinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
