@@ -6,7 +6,7 @@ A collection of AI/ML-based projects developed as part of my virtual internship 
 
 ## 📂 Projects Included
 
-### 1. LendAI (Intermediate Level)
+### 1. LendAI
 
 A machine learning system that predicts loan approval based on applicant data.
 
@@ -26,7 +26,7 @@ A machine learning system that predicts loan approval based on applicant data.
 
 ---
 
-### 2. AutoKey (Beginner Level)
+### 2. AutoKey
 
 A basic autocorrect keyboard system that predicts and corrects user input using NLP techniques.
 
